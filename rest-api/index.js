@@ -43,7 +43,14 @@ app.post("/api/build", validateRequest, async (req, res) => {
     logger.info("Creating container...");
     const container = await docker.createContainer({
       Image: "build-server",
-      Env: [`GIT_REPO_URL=${gitRepoUrl}`, `PROJECT_ID=${projectName}`],
+      Env: [
+        `GIT_REPO_URL=${gitRepoUrl}`,
+        `PROJECT_ID=${projectName}`,
+        `R2_ACCOUNT_ID = ${process.env.R2_ACCOUNT_ID}`,
+        `R2_ACCESS_KEY_ID = ${process.env.R2_ACCESS_KEY_ID}`,
+        `R2_SECRET_ACCESS_KEY = ${process.env.R2_SECRET_ACCESS_KEY}`,
+        `R2_BUCKET_NAME = ${process.env.R2_BUCKET_NAME}`,
+      ],
       AttachStdout: true,
       AttachStderr: true,
       Tty: false,
