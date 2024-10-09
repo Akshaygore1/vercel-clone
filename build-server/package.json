@@ -1,0 +1,14 @@
+{
+  "name": "build-server",
+  "version": "1.0.0",
+  "description": "This Service will build project and store file to object service",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Akshay Gore",
+  "license": "ISC",
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.668.0"
+  }
+}
