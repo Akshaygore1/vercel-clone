@@ -1,0 +1,41 @@
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+input,
+button {
+  margin-bottom: 10px;
+}
+
+.logs {
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 20px;
+}
+
+.log-entry {
+  margin-bottom: 5px;
+}
+
+.log-entry.info {
+  color: blue;
+}
+
+.log-entry.error {
+  color: red;
+}
+
+.build-result {
+  background-color: #e0e0e0;
+  padding: 10px;
+  border-radius: 5px;
+}
