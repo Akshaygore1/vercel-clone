@@ -1,41 +1,287 @@
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+:root {
+  --bg-color: #2e2e3e; /* Dark Slate Gray */
+  --text-color: #e0e0e0; /* Light Gray */
+  --primary-color: #a3c4f3; /* Pastel Blue */
+  --secondary-color: #b8e0d2; /* Pastel Mint */
+  --error-color: #f28b82; /* Pastel Red */
+  --success-color: #81c995; /* Pastel Green */
+  --warning-color: #ffd580; /* Pastel Yellow */
 }
 
-form {
+body {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+    "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  margin-bottom: 20px;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
 }
 
-input,
-button {
-  margin-bottom: 10px;
+.particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  background-color: var(--secondary-color);
+  opacity: 0.5;
+  animation: float 20s infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-100px) translateX(100px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+.container {
+  max-width: 800px;
+  width: 100%;
+  padding: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  font-size: 3rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: var(--primary-color);
+  text-shadow: 0 0 10px rgba(0, 112, 243, 0.5);
+}
+
+.form {
+  background-color: rgba(22, 27, 34, 0.8);
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.form-group {
+  padding: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--secondary-color);
+}
+
+input {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  background-color: rgba(22, 27, 34, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: var(--text-color);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(0, 112, 243, 0.2);
+}
+
+.submit-button {
+  background-color: var(--primary-color);
+  color: #000000;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.submit-button:hover {
+  background-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.submit-button:disabled {
+  background-color: #4a5568;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.logs-container {
+  background-color: rgba(22, 27, 34, 0.8);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.logs-title {
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
 }
 
 .logs {
-  background-color: #f0f0f0;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 20px;
+  font-family: "Fira Code", monospace;
+  height: 300px;
+  overflow-y: auto;
+  padding: 1rem;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
 }
 
 .log-entry {
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
 }
 
-.log-entry.info {
-  color: blue;
+.log-project {
+  color: var(--primary-color);
+  font-weight: bold;
 }
 
-.log-entry.error {
-  color: red;
+.log-message {
+  color: var(--text-color);
 }
 
-.build-result {
-  background-color: #e0e0e0;
-  padding: 10px;
-  border-radius: 5px;
+.log-entry.info .log-message {
+  color: var(--secondary-color);
 }
+
+.log-entry.error .log-message {
+  color: var(--error-color);
+}
+
+.build-status {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  background-color: rgba(0, 0, 0, 0.5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 0.5rem;
+  animation: blink 1s infinite;
+}
+
+.status-text {
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.build-status.started .status-indicator {
+  background-color: var(--warning-color);
+}
+
+.build-status.success .status-indicator {
+  background-color: var(--success-color);
+}
+
+.build-status.failed .status-indicator,
+.build-status.error .status-indicator {
+  background-color: var(--error-color);
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.view-project {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--success-color);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.15s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.view-project:hover {
+  background-color: #20b86e;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .form {
+    padding: 1rem;
+  }
+
+  .build-status {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* Particle positions */
+.particle:nth-child(3n) {
+  top: 20%;
+  left: 10%;
+}
+
+.particle:nth-child(3n + 1) {
+  top: 60%;
+  left: 80%;
+}
+
+.particle:nth-child(3n + 2) {
+  top: 40%;
+  left: 40%;
+}
+
+/* Add more variations as needed */
