@@ -122,6 +122,7 @@ app.post("/api/build", validateRequest, async (req, res) => {
     logger.info("Creating and starting Docker container...");
     const container = await docker.createContainer({
       Image: "akshaygore7798/build-server:latest",
+      // Image: "build-server",
       Env: [
         `GIT_REPO_URL=${gitRepoUrl}`,
         `PROJECT_ID=${projectName}`,

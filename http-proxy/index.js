@@ -12,9 +12,10 @@ app.use((req, res) => {
   const hostname = req.hostname;
   const subdomain = hostname.split(".")[0];
   console.log("subdomain", subdomain);
-  const name = subdomain.toLocaleUpperCase();
+  const name = subdomain;
 
-  const resolvesTo = `${BASE_PATH}/${name}/`;
+  const resolvesTo = `${BASE_PATH}/${name}`;
+
   console.log("resolvesTo", resolvesTo);
   return proxy.web(req, res, { target: resolvesTo, changeOrigin: true });
 });
