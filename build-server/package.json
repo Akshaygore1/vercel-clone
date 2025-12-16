@@ -1,0 +1,17 @@
+{
+  "name": "build-server",
+  "version": "1.0.0",
+  "description": "Build server with R2 upload capability",
+  "main": "upload-to-r2.js",
+  "scripts": {
+    "upload": "node upload-to-r2.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.0.0",
+    "@google-cloud/logging": "^11.2.1",
+    "@google-cloud/run": "^3.1.0"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}
