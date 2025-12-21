@@ -74,6 +74,20 @@ async function uploadFile(filePath, key) {
   }
 }
 
+// Directories to skip during upload
+const SKIP_DIRECTORIES = [
+  ".git",
+  "node_modules",
+  ".cache",
+  ".next",
+  ".nuxt",
+  ".output",
+  ".vercel",
+  ".turbo",
+  "coverage",
+  ".nyc_output",
+];
+
 /**
  * Get all files recursively from a directory
  */
@@ -82,8 +96,13 @@ function getAllFiles(dirPath, arrayOfFiles = []) {
 
   files.forEach((file) => {
     const filePath = path.join(dirPath, file);
-    if (fs.statSync(filePath).isDirectory()) {
-      arrayOfFiles = getAllFiles(filePath, arrayOfFiles);
+    const stat = fs.statSync(filePath);
+
+    if (stat.isDirectory()) {
+      // Skip unwanted directories
+      if (!SKIP_DIRECTORIES.includes(file)) {
+        arrayOfFiles = getAllFiles(filePath, arrayOfFiles);
+      }
     } else {
       arrayOfFiles.push(filePath);
     }
