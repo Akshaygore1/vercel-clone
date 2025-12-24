@@ -105,17 +105,17 @@ export function DashboardPage() {
           <Button
             variant="outline"
             size="sm"
-            onClick={() => refetch()}
-            disabled={isLoading || isRefetching}
+            onClick={() => reposRefetch()}
+            disabled={reposLoading || reposIsRefetching}
           >
             <RefreshCw
-              className={`size-4 ${isRefetching ? "animate-spin" : ""}`}
+              className={`size-4 ${reposIsRefetching ? "animate-spin" : ""}`}
             />
             <span className="hidden sm:inline">Refresh</span>
           </Button>
         </div>
 
-        {isLoading && (
+        {reposLoading && (
           <div className="flex items-center justify-center py-20">
             <div className="flex flex-col items-center gap-4">
               <div className="size-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -124,21 +124,21 @@ export function DashboardPage() {
           </div>
         )}
 
-        {error && (
+        {reposError && (
           <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center">
             <p className="text-destructive">Failed to load repositories</p>
             <Button
               variant="outline"
               size="sm"
               className="mt-4"
-              onClick={() => refetch()}
+              onClick={() => reposRefetch()}
             >
               Try Again
             </Button>
           </div>
         )}
 
-        {!isLoading && !error && repos.length === 0 && (
+        {!reposLoading && !reposError && repos.length === 0 && (
           <div className="rounded-lg border bg-card p-8 text-center">
             <p className="text-muted-foreground">No repositories found</p>
           </div>

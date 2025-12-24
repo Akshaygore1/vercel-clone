@@ -15,10 +15,11 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
     const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
     const redirectUri = `${backendUrl}/auth/github/callback`;
     const scope = "read:user user:email repo";
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
 
-    if (!clientId) {
+    if (!clientId || !clientSecret) {
       return new Response(
-        JSON.stringify({ error: "GitHub OAuth client ID not configured" }),
+        JSON.stringify({ error: "GitHub OAuth credentials not configured" }),
         {
           status: 500,
           headers: {
