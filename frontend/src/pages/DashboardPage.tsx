@@ -144,7 +144,7 @@ export function DashboardPage() {
           </div>
         )}
 
-        {!isLoading && !error && repos.length > 0 && (
+        {!reposLoading && !reposError && repos.length > 0 && (
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {repos.map((repo) => (
               <a
