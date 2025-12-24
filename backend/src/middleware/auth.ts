@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { jwt } from "@elysiajs/jwt";
+import { cookie } from "@elysiajs/cookie";
 import { db, users, type User } from "../db";
 import { eq } from "drizzle-orm";
 
@@ -21,20 +22,20 @@ export const jwtPlugin = new Elysia({ name: "jwtPlugin" }).use(
 );
 
 export const authPlugin = new Elysia({ name: "auth" })
+  .use(cookie())
   .use(jwtPlugin)
-  // @ts-ignore - Elysia derive type inference issue
-  .derive(async ({ jwt: jwtInstance, cookie }): Promise<AuthContext> => {
-    const token = cookie.auth?.value;
+  .derive(async (ctx) => {
+    const token = ctx.cookie?.auth?.value;
 
     if (!token) {
-      return { user: null, isAuthenticated: false };
+      return { user: null as User | null, isAuthenticated: false };
     }
 
     try {
-      const payload = await jwtInstance.verify(token as string);
+      const payload = await ctx.jwt.verify(token as string);
 
       if (!payload || typeof payload !== "object" || !("userId" in payload)) {
-        return { user: null, isAuthenticated: false };
+        return { user: null as User | null, isAuthenticated: false };
       }
 
       const userId = (payload as unknown as JWTPayload).userId;
@@ -46,12 +47,12 @@ export const authPlugin = new Elysia({ name: "auth" })
         .limit(1);
 
       if (!user) {
-        return { user: null, isAuthenticated: false };
+        return { user: null as User | null, isAuthenticated: false };
       }
 
       return { user, isAuthenticated: true };
     } catch {
-      return { user: null, isAuthenticated: false };
+      return { user: null as User | null, isAuthenticated: false };
     }
   });
 

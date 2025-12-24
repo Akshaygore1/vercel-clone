@@ -1,5 +1,6 @@
 import { Elysia } from "elysia";
 import { cors } from "@elysiajs/cors";
+import { cookie } from "@elysiajs/cookie";
 import "dotenv/config";
 
 import { authRoutes } from "./routes/auth";
@@ -7,6 +8,7 @@ import { reposRoutes } from "./routes/repos";
 import { webhookRoutes } from "./routes/webhook";
 
 const app = new Elysia()
+  .use(cookie())
   .use(
     cors({
       origin: process.env.FRONTEND_URL || "http://localhost:5173",
