@@ -1,11 +1,26 @@
-import { Button } from "./components/ui/button";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "@/context/AuthContext";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { LoginPage } from "@/pages/LoginPage";
+import { DashboardPage } from "@/pages/DashboardPage";
 
 function App() {
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <h1 className="text-2xl font-bold">Hello World</h1>
-      <Button className="mt-4">Click me</Button>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 

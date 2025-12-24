@@ -2,23 +2,44 @@ import { Elysia } from "elysia";
 import { db, users, type User } from "../db";
 import { eq } from "drizzle-orm";
 import { exchangeCodeForToken, getGitHubUser } from "../lib/github";
-import { authPlugin, jwtPlugin } from "../middleware/auth";
+import { jwtPlugin, type JWTPayload } from "../middleware/auth";
+import { cookie } from "@elysiajs/cookie";
 
 const GITHUB_OAUTH_URL = "https://github.com/login/oauth/authorize";
 
 export const authRoutes = new Elysia({ prefix: "/auth" })
+  .use(cookie())
   .use(jwtPlugin)
   .get("/github", ({ set }) => {
     const clientId = process.env.GITHUB_CLIENT_ID;
-    const redirectUri = `${process.env.BACKEND_URL}/auth/github/callback`;
+    const backendUrl = process.env.BACKEND_URL || "http://localhost:3000";
+    const redirectUri = `${backendUrl}/auth/github/callback`;
     const scope = "read:user user:email repo";
+    const clientSecret = process.env.GITHUB_CLIENT_SECRET;
+
+    if (!clientId || !clientSecret) {
+      return new Response(
+        JSON.stringify({ error: "GitHub OAuth credentials not configured" }),
+        {
+          status: 500,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
 
     const authUrl = new URL(GITHUB_OAUTH_URL);
-    authUrl.searchParams.set("client_id", clientId!);
+    authUrl.searchParams.set("client_id", clientId);
     authUrl.searchParams.set("redirect_uri", redirectUri);
     authUrl.searchParams.set("scope", scope);
 
-    set.redirect = authUrl.toString();
+    return new Response(null, {
+      status: 302,
+      headers: {
+        Location: authUrl.toString(),
+      },
+    });
   })
   .get("/github/callback", async ({ query, jwt, cookie, set }) => {
     const { code } = query;
@@ -78,40 +99,70 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       });
 
       // Set HTTP-only cookie
+      const isProduction = process.env.NODE_ENV === "production";
       cookie.auth.set({
         value: token,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: isProduction,
         sameSite: "lax",
         maxAge: 60 * 60 * 24 * 7, // 7 days
         path: "/",
+        ...(isProduction ? {} : { domain: "localhost" }),
       });
 
       // Redirect to frontend
-      set.redirect = process.env.FRONTEND_URL || "http://localhost:5173";
+      const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: frontendUrl,
+        },
+      });
     } catch (error) {
       console.error("GitHub OAuth error:", error);
       set.status = 500;
       return { error: "Authentication failed" };
     }
   })
-  .use(authPlugin)
-  .get("/me", (ctx: any) => {
-    const { user, isAuthenticated } = ctx as { user: User | null; isAuthenticated: boolean };
-    if (!isAuthenticated || !user) {
+  .get("/me", async ({ cookie, jwt }) => {
+    const token = cookie.auth?.value;
+
+    if (!token) {
       return { authenticated: false, user: null };
     }
 
-    return {
-      authenticated: true,
-      user: {
-        id: user.id,
-        username: user.username,
-        email: user.email,
-        avatarUrl: user.avatarUrl,
-        createdAt: user.createdAt,
-      },
-    };
+    try {
+      const payload = await jwt.verify(token as string);
+
+      if (!payload || typeof payload !== "object" || !("userId" in payload)) {
+        return { authenticated: false, user: null };
+      }
+
+      const userId = (payload as unknown as JWTPayload).userId;
+
+      const [user] = await db
+        .select()
+        .from(users)
+        .where(eq(users.id, userId))
+        .limit(1);
+
+      if (!user) {
+        return { authenticated: false, user: null };
+      }
+
+      return {
+        authenticated: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          avatarUrl: user.avatarUrl,
+          createdAt: user.createdAt,
+        },
+      };
+    } catch (error) {
+      return { authenticated: false, user: null };
+    }
   })
   .post("/logout", ({ cookie }) => {
     cookie.auth.remove();

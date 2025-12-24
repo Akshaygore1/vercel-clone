@@ -1,13 +1,13 @@
 import { Elysia } from "elysia";
-import { requireAuth } from "../middleware/auth";
+import { authPlugin, requireAuth } from "../middleware/auth";
 import { getGitHubUserRepos } from "../lib/github";
 import type { User } from "../db";
 
 export const reposRoutes = new Elysia()
+  .use(authPlugin)
   .use(requireAuth)
   .get("/allRepos", async (ctx: any) => {
     const { user, set } = ctx as { user: User | null; set: { status: number } };
-    
     if (!user) {
       set.status = 401;
       return { error: "User not found" };
