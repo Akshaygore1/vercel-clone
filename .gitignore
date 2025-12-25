@@ -4,3 +4,5 @@ node_modules/
 
 
 .cursor
+.env
+.env.local

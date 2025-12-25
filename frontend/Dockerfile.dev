@@ -1,0 +1,17 @@
+FROM oven/bun:1-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json bun.lock* ./
+
+# Install dependencies
+RUN bun install
+
+# Copy source code (will be overridden by volume mount)
+COPY . .
+
+EXPOSE 5173
+
+# Run Vite dev server with host flag for container access
+CMD ["bun", "run", "vite", "--host", "0.0.0.0"]
