@@ -1,16 +1,15 @@
-import { useAuthQuery, useLogoutMutation } from "@/hooks/useAuthQuery";
+import { useAuthQuery } from "@/hooks/useAuthQuery";
 import { useReposQuery } from "@/hooks/useReposQuery";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { LogOut, Search, Lock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Search, Lock } from "lucide-react";
 import { formatRelativeTime } from "@/lib/formatRelativeTime";
 import { useState } from "react";
+import { Navbar } from "@/components/navbar";
 
 export function DashboardPage() {
-  const navigate = useNavigate();
   const { data: authData } = useAuthQuery();
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -21,20 +20,10 @@ export function DashboardPage() {
     refetch: reposRefetch,
   } = useReposQuery(authData?.authenticated ?? false, {
     filter: searchQuery || undefined,
-    limit: 10,
+    limit: 5,
   });
 
   const repos = reposData?.repos ?? [];
-
-  const logoutMutation = useLogoutMutation();
-
-  const handleLogout = () => {
-    logoutMutation.mutate(undefined, {
-      onSuccess: () => {
-        navigate("/login");
-      },
-    });
-  };
 
   // Get initials or first letter for avatar fallback
   const getRepoInitial = (name: string) => {
@@ -59,54 +48,7 @@ export function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="container flex h-16 items-center justify-between px-4 mx-auto">
-          <div className="flex items-center gap-3">
-            <div className="size-8 rounded-lg bg-primary flex items-center justify-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="size-4 text-primary-foreground"
-              >
-                <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
-              </svg>
-            </div>
-            <span className="text-lg font-semibold">Deploy</span>
-          </div>
-
-          <div className="flex items-center gap-4">
-            {authData?.user && (
-              <div className="flex items-center gap-3">
-                {authData?.user.avatarUrl && (
-                  <img
-                    src={authData?.user.avatarUrl}
-                    alt={authData?.user.username}
-                    className="size-8 rounded-full ring-2 ring-border"
-                  />
-                )}
-                <span className="text-sm font-medium hidden sm:block">
-                  {authData?.user.username}
-                </span>
-              </div>
-            )}
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={handleLogout}
-              disabled={logoutMutation.isPending}
-            >
-              <LogOut className="size-4" />
-              <span className="hidden sm:inline">Logout</span>
-            </Button>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content */}
       <main className="container px-4 py-8 mx-auto max-w-3xl">
