@@ -59,6 +59,17 @@ export const api = {
   checkAuth: () => fetchAPI<AuthResponse>("/auth/me"),
   logout: () =>
     fetchAPI<{ success: boolean }>("/auth/logout", { method: "POST" }),
-  getRepos: () => fetchAPI<ReposResponse>("/allRepos"),
+  getRepos: (params?: { filter?: string; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.filter) {
+      searchParams.set("filter", params.filter);
+    }
+    if (params?.limit !== undefined) {
+      searchParams.set("limit", params.limit.toString());
+    }
+    const queryString = searchParams.toString();
+    const endpoint = queryString ? `/allRepos?${queryString}` : "/allRepos";
+    return fetchAPI<ReposResponse>(endpoint);
+  },
   getLoginUrl: () => `${API_URL}/auth/github`,
 };

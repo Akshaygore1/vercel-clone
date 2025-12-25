@@ -24,9 +24,8 @@ export const jwtPlugin = new Elysia({ name: "jwtPlugin" }).use(
 export const authPlugin = new Elysia({ name: "auth" })
   .use(cookie())
   .use(jwtPlugin)
-  .derive(async (ctx) => {
+  .derive({ as: "global" }, async (ctx) => {
     const token = ctx.cookie?.auth?.value;
-
     if (!token) {
       return { user: null as User | null, isAuthenticated: false };
     }
@@ -58,7 +57,7 @@ export const authPlugin = new Elysia({ name: "auth" })
 
 export const requireAuth = new Elysia({ name: "requireAuth" })
   .use(authPlugin)
-  .onBeforeHandle((ctx: any) => {
+  .onBeforeHandle({ as: "scoped" }, (ctx: any) => {
     const { user, isAuthenticated, set } = ctx;
     if (!isAuthenticated || !user) {
       set.status = 401;

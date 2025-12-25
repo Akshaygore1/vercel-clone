@@ -65,35 +65,30 @@ export async function getGitHubUser(accessToken: string): Promise<GitHubUser> {
 }
 
 export async function getGitHubUserRepos(
-  accessToken: string
+  accessToken: string,
+  limit?: number
 ): Promise<GitHubRepo[]> {
-  const repos: GitHubRepo[] = [];
-  let page = 1;
-  const perPage = 100;
+  const perPage = limit ? Math.min(limit, 100) : 100; // GitHub API max is 100 per page
 
-  while (true) {
-    const response = await fetch(
-      `${GITHUB_API_BASE}/user/repos?per_page=${perPage}&page=${page}&sort=updated`,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: "application/vnd.github.v3+json",
-        },
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Failed to fetch repos: ${response.statusText}`);
+  const response = await fetch(
+    `${GITHUB_API_BASE}/user/repos?per_page=${perPage}&sort=updated`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: "application/vnd.github.v3+json",
+      },
     }
+  );
 
-    const pageRepos: GitHubRepo[] = await response.json();
-    repos.push(...pageRepos);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch repos: ${response.statusText}`);
+  }
 
-    if (pageRepos.length < perPage) {
-      break;
-    }
+  const repos: GitHubRepo[] = await response.json();
 
-    page++;
+  // If we have a limit, slice the results
+  if (limit) {
+    return repos.slice(0, limit);
   }
 
   return repos;

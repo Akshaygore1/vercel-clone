@@ -2,7 +2,7 @@ import { Elysia } from "elysia";
 import { db, users, type User } from "../db";
 import { eq } from "drizzle-orm";
 import { exchangeCodeForToken, getGitHubUser } from "../lib/github";
-import { jwtPlugin, type JWTPayload } from "../middleware/auth";
+import { jwtPlugin, type JWTPayload, requireAuth } from "../middleware/auth";
 import { cookie } from "@elysiajs/cookie";
 
 const GITHUB_OAUTH_URL = "https://github.com/login/oauth/authorize";
@@ -124,45 +124,19 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       return { error: "Authentication failed" };
     }
   })
-  .get("/me", async ({ cookie, jwt }) => {
-    const token = cookie.auth?.value;
-
-    if (!token) {
-      return { authenticated: false, user: null };
-    }
-
-    try {
-      const payload = await jwt.verify(token as string);
-
-      if (!payload || typeof payload !== "object" || !("userId" in payload)) {
-        return { authenticated: false, user: null };
-      }
-
-      const userId = (payload as unknown as JWTPayload).userId;
-
-      const [user] = await db
-        .select()
-        .from(users)
-        .where(eq(users.id, userId))
-        .limit(1);
-
-      if (!user) {
-        return { authenticated: false, user: null };
-      }
-
-      return {
-        authenticated: true,
-        user: {
-          id: user.id,
-          username: user.username,
-          email: user.email,
-          avatarUrl: user.avatarUrl,
-          createdAt: user.createdAt,
-        },
-      };
-    } catch (error) {
-      return { authenticated: false, user: null };
-    }
+  .use(requireAuth)
+  .get("/me", async (ctx: any) => {
+    const { user } = ctx as { user: User };
+    return {
+      authenticated: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        avatarUrl: user.avatarUrl,
+        createdAt: user.createdAt,
+      },
+    };
   })
   .post("/logout", ({ cookie }) => {
     cookie.auth.remove();

@@ -1,32 +1,28 @@
 import { useAuthQuery, useLogoutMutation } from "@/hooks/useAuthQuery";
 import { useReposQuery } from "@/hooks/useReposQuery";
 import { Button } from "@/components/ui/button";
-import {
-  LogOut,
-  ExternalLink,
-  GitFork,
-  Lock,
-  Globe,
-  RefreshCw,
-} from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Skeleton } from "@/components/ui/skeleton";
+import { LogOut, Search, Lock } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { formatRelativeTime } from "@/lib/formatRelativeTime";
+import { useState } from "react";
 
 export function DashboardPage() {
   const navigate = useNavigate();
-  const {
-    data: authData,
-    isLoading,
-    error,
-    refetch,
-    isRefetching,
-  } = useAuthQuery();
+  const { data: authData } = useAuthQuery();
+  const [searchQuery, setSearchQuery] = useState("");
+
   const {
     data: reposData,
     isLoading: reposLoading,
     error: reposError,
     refetch: reposRefetch,
-    isRefetching: reposIsRefetching,
-  } = useReposQuery(authData?.authenticated ?? false);
+  } = useReposQuery(authData?.authenticated ?? false, {
+    filter: searchQuery || undefined,
+    limit: 10,
+  });
 
   const repos = reposData?.repos ?? [];
 
@@ -38,6 +34,27 @@ export function DashboardPage() {
         navigate("/login");
       },
     });
+  };
+
+  // Get initials or first letter for avatar fallback
+  const getRepoInitial = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
+  // Get a color based on repo name for variety
+  const getAvatarColor = (name: string) => {
+    const colors = [
+      "bg-blue-500",
+      "bg-green-500",
+      "bg-purple-500",
+      "bg-orange-500",
+      "bg-pink-500",
+      "bg-yellow-500",
+      "bg-teal-500",
+      "bg-indigo-500",
+    ];
+    const index = name.charCodeAt(0) % colors.length;
+    return colors[index];
   };
 
   return (
@@ -92,108 +109,119 @@ export function DashboardPage() {
       </header>
 
       {/* Main Content */}
-      <main className="container px-4 py-8 mx-auto">
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Your Repositories
-            </h1>
-            <p className="text-muted-foreground mt-1">
-              Select a repository to deploy
-            </p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => reposRefetch()}
-            disabled={reposLoading || reposIsRefetching}
-          >
-            <RefreshCw
-              className={`size-4 ${reposIsRefetching ? "animate-spin" : ""}`}
-            />
-            <span className="hidden sm:inline">Refresh</span>
-          </Button>
-        </div>
+      <main className="container px-4 py-8 mx-auto max-w-3xl">
+        {/* Import Git Repository Section */}
+        <div className="rounded-xl border bg-card p-6">
+          <h2 className="text-xl font-semibold mb-6">Import Git Repository</h2>
 
-        {reposLoading && (
-          <div className="flex items-center justify-center py-20">
-            <div className="flex flex-col items-center gap-4">
-              <div className="size-8 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-              <p className="text-muted-foreground">Loading repositories...</p>
+          {/* Filter Bar */}
+          <div className="flex gap-3 mb-6">
+            {/* Search Input */}
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9"
+              />
             </div>
           </div>
-        )}
 
-        {reposError && (
-          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center">
-            <p className="text-destructive">Failed to load repositories</p>
-            <Button
-              variant="outline"
-              size="sm"
-              className="mt-4"
-              onClick={() => reposRefetch()}
-            >
-              Try Again
-            </Button>
-          </div>
-        )}
+          {/* Repository List */}
+          <div className="space-y-1">
+            {/* Loading State */}
+            {reposLoading && (
+              <div className="space-y-1">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="flex items-center gap-4 px-4 py-3 rounded-lg"
+                  >
+                    <Skeleton className="size-10 rounded-full" />
+                    <div className="flex-1 space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                    </div>
+                    <Skeleton className="h-4 w-16" />
+                    <Skeleton className="h-9 w-20 rounded-lg" />
+                  </div>
+                ))}
+              </div>
+            )}
 
-        {!reposLoading && !reposError && repos.length === 0 && (
-          <div className="rounded-lg border bg-card p-8 text-center">
-            <p className="text-muted-foreground">No repositories found</p>
-          </div>
-        )}
+            {/* Error State */}
+            {reposError && (
+              <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-center">
+                <p className="text-destructive">Failed to load repositories</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-4"
+                  onClick={() => reposRefetch()}
+                >
+                  Try Again
+                </Button>
+              </div>
+            )}
 
-        {!reposLoading && !reposError && repos.length > 0 && (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {repos.map((repo) => (
-              <a
-                key={repo.id}
-                href={repo.htmlUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group rounded-xl border bg-card p-5 transition-all hover:border-primary/50 hover:shadow-md"
-              >
-                <div className="flex items-start justify-between gap-2">
+            {/* Empty State */}
+            {!reposLoading && !reposError && repos.length === 0 && (
+              <div className="rounded-lg border bg-muted/50 p-8 text-center">
+                <p className="text-muted-foreground">
+                  {searchQuery
+                    ? "No repositories match your search"
+                    : "No repositories found"}
+                </p>
+              </div>
+            )}
+
+            {/* Repository Items */}
+            {!reposLoading &&
+              !reposError &&
+              repos.map((repo) => (
+                <div
+                  key={repo.id}
+                  className="flex items-center gap-4 px-4 py-3 rounded-lg hover:bg-accent/50 transition-colors group"
+                >
+                  {/* Avatar */}
+                  <Avatar className="size-10">
+                    <AvatarFallback
+                      className={`${getAvatarColor(
+                        repo.name
+                      )} text-white font-semibold`}
+                    >
+                      {getRepoInitial(repo.name)}
+                    </AvatarFallback>
+                  </Avatar>
+
+                  {/* Repo Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <h3 className="font-semibold truncate group-hover:text-primary transition-colors">
-                        {repo.name}
-                      </h3>
-                      {repo.private ? (
+                      <span className="font-medium truncate">{repo.name}</span>
+                      {repo.private && (
                         <Lock className="size-3.5 text-muted-foreground shrink-0" />
-                      ) : (
-                        <Globe className="size-3.5 text-muted-foreground shrink-0" />
                       )}
                     </div>
-                    {repo.description && (
-                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                        {repo.description}
-                      </p>
-                    )}
                   </div>
-                  <ExternalLink className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
-                </div>
 
-                <div className="flex items-center gap-4 mt-4 text-xs text-muted-foreground">
-                  {repo.language && (
-                    <div className="flex items-center gap-1.5">
-                      <span className="size-2.5 rounded-full bg-primary" />
-                      {repo.language}
-                    </div>
-                  )}
-                  {repo.fork && (
-                    <div className="flex items-center gap-1">
-                      <GitFork className="size-3" />
-                      Fork
-                    </div>
-                  )}
-                  <span>{repo.defaultBranch}</span>
+                  {/* Time */}
+                  <span className="text-sm text-muted-foreground shrink-0">
+                    {formatRelativeTime(repo.updatedAt)}
+                  </span>
+
+                  {/* Import Button */}
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                  >
+                    Import
+                  </Button>
                 </div>
-              </a>
-            ))}
+              ))}
           </div>
-        )}
+        </div>
       </main>
     </div>
   );
