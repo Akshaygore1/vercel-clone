@@ -6,6 +6,7 @@ import "dotenv/config";
 import { authRoutes } from "./routes/auth";
 import { reposRoutes } from "./routes/repos";
 import { webhookRoutes } from "./routes/webhook";
+import { deployRoutes } from "./routes/deploy";
 
 const app = new Elysia()
   .use(cookie())
@@ -24,6 +25,7 @@ const app = new Elysia()
   .use(authRoutes)
   .use(reposRoutes)
   .use(webhookRoutes)
+  .use(deployRoutes)
   .listen(3000);
 
 console.log(

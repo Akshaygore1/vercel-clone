@@ -6,3 +6,4 @@ node_modules/
 .cursor
 .env
 .env.local
+service-account.json

@@ -121,3 +121,14 @@ export async function verifyWebhookSignature(
 
   return signature === expectedSignature;
 }
+
+export async function getGitHubRepo(
+  fullName: string
+): Promise<GitHubRepo | null> {
+  const response = await fetch(`${GITHUB_API_BASE}/repos/${fullName}`);
+  if (!response.ok) {
+    throw new Error(`Failed to fetch repo: ${response.statusText}`);
+  }
+
+  return response.json();
+}

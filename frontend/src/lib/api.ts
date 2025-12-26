@@ -35,6 +35,28 @@ export interface ReposResponse {
   repos: Repo[];
 }
 
+export interface DeployRequest {
+  repoFullName: string;
+  projectName: string;
+}
+
+export interface DeployResponse {
+  success: boolean;
+  deploymentId: number;
+  message: string;
+}
+
+export interface DeploymentStatus {
+  id: number;
+  projectName: string;
+  repoFullName: string;
+  status: "pending" | "building" | "deployed" | "failed";
+  deployUrl: string | null;
+  buildLogs: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
 async function fetchAPI<T>(
   endpoint: string,
   options?: RequestInit
@@ -72,4 +94,11 @@ export const api = {
     return fetchAPI<ReposResponse>(endpoint);
   },
   getLoginUrl: () => `${API_URL}/auth/github`,
+  deployRepo: (data: DeployRequest) =>
+    fetchAPI<DeployResponse>("/deploy", {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+  getDeploymentStatus: (deploymentId: number) =>
+    fetchAPI<DeploymentStatus>(`/deploy/${deploymentId}`),
 };

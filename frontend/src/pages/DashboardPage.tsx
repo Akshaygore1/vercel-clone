@@ -7,11 +7,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Search, Lock } from "lucide-react";
 import { formatRelativeTime } from "@/lib/formatRelativeTime";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Navbar } from "@/components/navbar";
 
 export function DashboardPage() {
   const { data: authData } = useAuthQuery();
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const {
     data: reposData,
@@ -157,6 +159,10 @@ export function DashboardPage() {
                     variant="outline"
                     size="sm"
                     className="shrink-0 opacity-80 group-hover:opacity-100 transition-opacity"
+                    onClick={() => {
+                      const [owner, repoName] = repo.fullName.split("/");
+                      navigate(`/deploy/${owner}/${repoName}`);
+                    }}
                   >
                     Import
                   </Button>
