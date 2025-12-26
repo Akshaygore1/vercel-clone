@@ -1,5 +1,5 @@
 {
-  "name": "backend",
+  "name": "@deploy/backend",
   "version": "1.0.50",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
@@ -22,6 +22,8 @@
     "postgres": "^3.4.7"
   },
   "devDependencies": {
+    "@deploy/shared": "workspace:*",
+    "@deploy/tsconfig": "workspace:*",
     "@types/node": "^25.0.3",
     "bun-types": "latest",
     "drizzle-kit": "^0.31.8"
