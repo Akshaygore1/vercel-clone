@@ -38,7 +38,7 @@ export function LoginPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              Welcome to Deploy
+              Welcome to Dploy
             </h1>
             <p className="text-muted-foreground mt-2">
               Ship your code to production in seconds
