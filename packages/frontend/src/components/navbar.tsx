@@ -1,6 +1,6 @@
 import { useAuthQuery, useLogoutMutation } from "@/hooks/useAuthQuery";
 import { Button } from "@/components/ui/button";
-import { LogOut, Triangle } from "lucide-react";
+import { LogOut, Diamond } from "lucide-react";
 import { useNavigate, Link } from "react-router-dom";
 
 export function Navbar() {
@@ -24,8 +24,8 @@ export function Navbar() {
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
-            <Triangle className="size-5 fill-foreground" />
-            <span className="text-base font-semibold">Deploy</span>
+            <Diamond className="size-5 fill-foreground" />
+            <span className="text-base font-semibold">Dploy</span>
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">

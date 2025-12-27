@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Github, Triangle, Loader2 } from "lucide-react";
+import { Github, Diamond, Loader2 } from "lucide-react";
 
 export function LoginPage() {
   const { isAuthenticated, isLoading, login } = useAuth();
@@ -34,7 +34,7 @@ export function LoginPage() {
         {/* Logo */}
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <Triangle className="size-12 fill-foreground" />
+            <Diamond className="size-12 fill-foreground" />
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
