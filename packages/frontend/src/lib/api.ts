@@ -101,4 +101,7 @@ export const api = {
     }),
   getDeploymentStatus: (deploymentId: number) =>
     fetchAPI<DeploymentStatus>(`/deploy/${deploymentId}`),
+  getProjects: () => fetchAPI<DeploymentStatus[]>("/projects"),
+  getProjectByName: (projectName: string) =>
+    fetchAPI<DeploymentStatus>(`/projects/${projectName}`),
 };
