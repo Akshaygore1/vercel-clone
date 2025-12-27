@@ -1,59 +1,28 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/context/AuthContext";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { LoginPage } from "@/pages/LoginPage";
-import { DashboardPage } from "@/pages/DashboardPage";
-import { ImportPage } from "@/pages/ImportPage";
-import { ConfigurePage } from "@/pages/ConfigurePage";
-import { DeployPage } from "@/pages/DeployPage";
-import { ProjectPage } from "@/pages/ProjectPage";
+import { ProtectedLayout } from "@/components/ProtectedLayout";
+import { publicRoutes, protectedRoutes } from "@/routes";
 
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route
-            path="/"
-            element={
-              <ProtectedRoute>
-                <DashboardPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/new"
-            element={
-              <ProtectedRoute>
-                <ImportPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/new/:owner/:repo"
-            element={
-              <ProtectedRoute>
-                <ConfigurePage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/deploying/:deploymentId"
-            element={
-              <ProtectedRoute>
-                <DeployPage />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/project/:projectName"
-            element={
-              <ProtectedRoute>
-                <ProjectPage />
-              </ProtectedRoute>
-            }
-          />
+          {/* Public routes */}
+          {publicRoutes.map((route) => (
+            <Route key={route.path} path={route.path} element={route.element} />
+          ))}
+
+          {/* Protected routes with shared layout (Navbar) */}
+          <Route element={<ProtectedLayout />}>
+            {protectedRoutes.map((route) => (
+              <Route
+                key={route.path}
+                path={route.path}
+                element={route.element}
+              />
+            ))}
+          </Route>
         </Routes>
       </AuthProvider>
     </BrowserRouter>
