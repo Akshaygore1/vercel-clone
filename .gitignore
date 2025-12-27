@@ -3,7 +3,7 @@ node_modules/
 **/.git.bak/
 
 
-.cursor
 .env
 .env.local
 service-account.json
+.turbo
