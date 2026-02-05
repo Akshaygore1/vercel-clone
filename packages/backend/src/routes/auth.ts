@@ -96,7 +96,7 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
       const token = await jwt.sign({
         userId,
         githubId: githubUser.id.toString(),
-      });
+      } as JWTPayload);
 
       // Set HTTP-only cookie
       const isProduction = process.env.NODE_ENV === "production";

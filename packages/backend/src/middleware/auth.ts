@@ -4,7 +4,7 @@ import { cookie } from "@elysiajs/cookie";
 import { db, users, type User } from "../db";
 import { eq } from "drizzle-orm";
 
-export interface JWTPayload {
+export interface JWTPayload extends Record<string, any> {
   userId: number;
   githubId: string;
 }
